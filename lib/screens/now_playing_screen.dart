@@ -4,7 +4,6 @@ import 'package:echo/screens/all_songs.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_sheet_allsongs.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:seekbar/seekbar.dart';
 
 class NowPlayingScreen extends StatefulWidget {
@@ -130,15 +129,17 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
   }
 
   String _printDuration(Duration duration) {
-    String twoDigits(int n) {
-      if (n >= 10) return "$n";
-      return "0$n";
-    }
+    if (duration != null) {
+      String twoDigits(int n) {
+        if (n >= 10) return "$n";
+        return "0$n";
+      }
 
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    if (duration.inMinutes < 60) return "$twoDigitMinutes:$twoDigitSeconds";
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+      String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+      String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+      if (duration.inMinutes < 60) return "$twoDigitMinutes:$twoDigitSeconds";
+      return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+    }
   }
 
   @override
@@ -208,8 +209,11 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                   Container(
                     padding: EdgeInsets.only(left: 20, right: 20),
                     child: SeekBar(
-                      value: AllSongs.currentDuration.inSeconds /
-                          (int.parse(AllSongs.currentSong.duration) * 0.001),
+                      value: AllSongs.currentSong == null
+                          ? 0.5
+                          : AllSongs.currentDuration.inSeconds /
+                              (int.parse(AllSongs.currentSong.duration) *
+                                  0.001),
                       barColor: Colors.white,
                       progressColor: Colors.amber,
                     ),
@@ -220,15 +224,19 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          _printDuration(AllSongs.currentDuration),
+                          AllSongs.currentDuration == null
+                              ? '00:00'
+                              : _printDuration(AllSongs.currentDuration),
                           style: TextStyle(
                               fontFamily: 'ComicNeue',
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          _printDuration(Duration(
-                              milliseconds:
-                                  int.parse(AllSongs.currentSong.duration))),
+                          AllSongs.currentSong == null
+                              ? '00:00'
+                              : _printDuration(Duration(
+                                  milliseconds: int.parse(
+                                      AllSongs.currentSong.duration))),
                           style: TextStyle(
                               fontFamily: 'ComicNeue',
                               fontWeight: FontWeight.bold),

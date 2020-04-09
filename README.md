@@ -12,4 +12,5 @@ Under Development
   <img src="https://github.com/vikanshu-joshi/ECHO-Flutter-Application/blob/master/screenshots/list.jpg" width="360" height="640"/>
   <img src="https://github.com/vikanshu-joshi/ECHO-Flutter-Application/blob/master/screenshots/info.jpg" width="360" height="640"/>
   <img src="https://github.com/vikanshu-joshi/ECHO-Flutter-Application/blob/master/screenshots/now_playing.jpg" width="360" height="640"/>
+  <img src="https://github.com/vikanshu-joshi/ECHO-Flutter-Application/blob/master/screenshots/vid.gif" width="360" height="640"/>
 </p>

@@ -8,7 +8,7 @@ import 'package:flutter_audio_query/flutter_audio_query.dart';
 class BottomPlayer extends StatelessWidget {
   final Function _playSong;
   final SongInfo _currentSong;
-  BottomPlayer(this._currentSong,this._playSong);
+  BottomPlayer(this._currentSong, this._playSong);
   @override
   Widget build(BuildContext context) {
     final MediaQueryData _mediaQuery = MediaQuery.of(context);
@@ -31,14 +31,17 @@ class BottomPlayer extends StatelessWidget {
           Expanded(
             child: Container(
               margin: EdgeInsets.only(left: 5, right: 5),
-              child: Text(
-                _currentSong == null
-                    ? 'Now Playing'
-                    : _currentSong.title,
-                style: TextStyle(color: Colors.white, fontSize: 20),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                textAlign: TextAlign.center,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamed(NowPlayingScreen.route);
+                },
+                child: Text(
+                  _currentSong == null ? 'Now Playing' : _currentSong.title,
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -53,15 +56,15 @@ class BottomPlayer extends StatelessWidget {
                   size: _mediaQuery.size.width * 0.1,
                 ),
                 onPressed: () {
-                  if(AllSongs.audioPlayer.state == AudioPlayerState.PLAYING){
+                  if (AllSongs.audioPlayer.state == AudioPlayerState.PLAYING) {
                     AllSongs.audioPlayer.pause();
                     AllSongs.isPlaying = false;
-                  }else{
-                    if(_currentSong != null){
+                  } else {
+                    if (_currentSong != null) {
                       AllSongs.audioPlayer.resume();
                       AllSongs.isPlaying = true;
-                    }else{
-                      _playSong(SplashScreen.allSongs[0],0);
+                    } else {
+                      _playSong(SplashScreen.allSongs[0], 0);
                     }
                   }
                 }),
