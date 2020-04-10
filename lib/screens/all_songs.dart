@@ -1,3 +1,4 @@
+import 'package:echo/screens/favourites_screen.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_player.dart';
 import 'package:echo/widgets/songs_list_builder.dart';
@@ -22,7 +23,6 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
-
   void getAllSongs() {
     FlutterAudioQuery().getSongs().then((onValue) {
       setState(() {
@@ -31,9 +31,9 @@ class _AllSongsState extends State<AllSongs> {
     });
   }
 
-  void _playSong(SongInfo _song,int index) async {
+  void _playSong(SongInfo _song, int index) async {
     AllSongs.prev = AllSongs.currentSong;
-    if(AllSongs.prev == null) AllSongs.prev = SplashScreen.allSongs[0];
+    if (AllSongs.prev == null) AllSongs.prev = SplashScreen.allSongs[0];
     int result = await AllSongs.audioPlayer.play(_song.filePath, isLocal: true);
     if (result == 1) {
       AllSongs.currIndex = index;
@@ -51,6 +51,15 @@ class _AllSongsState extends State<AllSongs> {
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
+              icon: Icon(
+                Icons.favorite,
+                color: Colors.white,
+              ),
+              onPressed: (){
+                Navigator.of(context).pushNamed(FavouritesScreen.route);
+              }),
+          IconButton(
+              tooltip: 'Refresh',
               icon: Icon(Icons.refresh),
               onPressed: () {
                 getAllSongs();

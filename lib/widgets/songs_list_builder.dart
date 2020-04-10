@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:echo/screens/all_songs.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_sheet_allsongs.dart';

@@ -1,4 +1,5 @@
 import 'package:echo/screens/all_songs.dart';
+import 'package:echo/screens/favourites_screen.dart';
 import 'package:echo/screens/now_playing_screen.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
       routes: {
         SplashScreen.route: (ctx) => SplashScreen(),
         AllSongs.route: (ctx) => AllSongs(),
-        NowPlayingScreen.route: (ctx) => NowPlayingScreen()
+        NowPlayingScreen.route: (ctx) => NowPlayingScreen(),
+        FavouritesScreen.route: (ctx) => FavouritesScreen()
       },
     );
   }

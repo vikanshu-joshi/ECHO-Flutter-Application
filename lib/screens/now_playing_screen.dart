@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:echo/model/data.dart';
+import 'package:echo/model/model.dart';
 import 'package:echo/screens/all_songs.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_sheet_allsongs.dart';
@@ -144,6 +146,25 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var _song = AllSongs.currentSong == null ? null : AllSongs.currentSong;
+    var _fav = _song == null
+        ? null
+        : SongModel(
+            _song.id,
+            _song.title,
+            _song.filePath,
+            _song.artist,
+            _song.album,
+            _song.duration,
+            _song.composer,
+            _song.fileSize,
+            _song.year);
+    bool isFavourite = false;
+    if (_song != null) {
+      for (var item in favouritesList) {
+        if (item.id == _fav.id) isFavourite = true;
+      }
+    }
     AllSongs.audioPlayer.onAudioPositionChanged.listen((onData) {
       setState(() {
         AllSongs.currentDuration = onData;
@@ -154,6 +175,29 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
       appBar: AppBar(
         title: Text('Now Playing'),
         actions: <Widget>[
+          IconButton(
+              icon: Icon(
+                isFavourite ? Icons.favorite : Icons.favorite_border,
+                color:
+                    isFavourite ? Theme.of(context).accentColor : Colors.white,
+              ),
+              onPressed: () {
+                if(_song != null){
+                  if (isFavourite) {
+                  favouritesList.removeWhere((test) {
+                    return test.id == _fav.id;
+                  });
+                  setState(() {
+                    isFavourite = false;
+                  });
+                } else {
+                  favouritesList.add(_fav);
+                  setState(() {
+                    isFavourite = true;
+                  });
+                }
+                }
+              }),
           IconButton(
               icon: Icon(Icons.info_outline),
               onPressed: () {
