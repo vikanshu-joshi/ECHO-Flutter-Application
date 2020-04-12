@@ -25,6 +25,7 @@ dependencies:
   audioplayers: ^0.15.0
   cupertino_icons: ^0.1.2
   seekbar: ^0.0.2
+  shared_preferences: ^0.5.6+3
 
 dev_dependencies:
   flutter_test:

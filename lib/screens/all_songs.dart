@@ -5,11 +5,12 @@ import 'package:echo/widgets/songs_list_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AllSongs extends StatefulWidget {
-  static bool shuffle = false;
-  static bool loop = false;
-  static bool repeatone = false;
+  static bool shuffle;
+  static bool loop;
+  static bool repeatone;
   static const route = 'all songs';
   static SongInfo currentSong;
   static AudioPlayer audioPlayer = AudioPlayer();
@@ -23,6 +24,20 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
+
+  @override
+  void initState() {
+    getPrefs();
+    super.initState();
+  }
+
+  void getPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    AllSongs.loop = prefs.getBool('loop') ?? false;
+    AllSongs.repeatone = prefs.getBool('repeat') ?? false;
+    AllSongs.shuffle = prefs.getBool('shuffle') ?? false;
+  }
+ 
   void getAllSongs() {
     FlutterAudioQuery().getSongs().then((onValue) {
       setState(() {

@@ -7,6 +7,7 @@ import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_sheet_allsongs.dart';
 import 'package:flutter/material.dart';
 import 'package:seekbar/seekbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   static const route = 'now playing';
@@ -106,14 +107,18 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
     }
   }
 
-  void shuffleToggle() {
+  void shuffleToggle() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       AllSongs.shuffle = !AllSongs.shuffle;
       if (AllSongs.shuffle) AllSongs.repeatone = false;
     });
+    prefs.setBool('shuffle', AllSongs.shuffle);
+    prefs.setBool('repeat', AllSongs.repeatone);
   }
 
-  void loopToggle() {
+  void loopToggle() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     if (!AllSongs.repeatone && !AllSongs.loop) {
       setState(() {
         AllSongs.loop = true;
@@ -125,9 +130,14 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
         AllSongs.shuffle = false;
       });
     } else if (AllSongs.repeatone && !AllSongs.loop) {
-      AllSongs.repeatone = false;
-      AllSongs.loop = false;
+      setState(() {
+        AllSongs.repeatone = false;
+        AllSongs.loop = false;
+      });
     }
+    prefs.setBool('shuffle', AllSongs.shuffle);
+    prefs.setBool('repeat', AllSongs.repeatone);
+    prefs.setBool('loop', AllSongs.loop);
   }
 
   String _printDuration(Duration duration) {
@@ -182,20 +192,20 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                     isFavourite ? Theme.of(context).accentColor : Colors.white,
               ),
               onPressed: () {
-                if(_song != null){
+                if (_song != null) {
                   if (isFavourite) {
-                  favouritesList.removeWhere((test) {
-                    return test.id == _fav.id;
-                  });
-                  setState(() {
-                    isFavourite = false;
-                  });
-                } else {
-                  favouritesList.add(_fav);
-                  setState(() {
-                    isFavourite = true;
-                  });
-                }
+                    favouritesList.removeWhere((test) {
+                      return test.id == _fav.id;
+                    });
+                    setState(() {
+                      isFavourite = false;
+                    });
+                  } else {
+                    favouritesList.add(_fav);
+                    setState(() {
+                      isFavourite = true;
+                    });
+                  }
                 }
               }),
           IconButton(
