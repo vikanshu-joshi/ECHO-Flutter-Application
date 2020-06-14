@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:echo/screens/favourites_screen.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:echo/widgets/bottom_player.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_audio_query/flutter_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:phone_state_i/phone_state_i.dart';
 
 class AllSongs extends StatefulWidget {
   static bool shuffle;
@@ -25,6 +28,8 @@ class AllSongs extends StatefulWidget {
 
 class _AllSongsState extends State<AllSongs> {
 
+  StreamSubscription _phoneState;
+
   @override
   void dispose() {
     AllSongs.audioPlayer.stop();
@@ -33,6 +38,12 @@ class _AllSongsState extends State<AllSongs> {
 
   @override
   void initState() {
+    _phoneState = phoneStateCallEvent.listen((event) { 
+      if(AllSongs.audioPlayer.state == AudioPlayerState.PLAYING){
+        AllSongs.audioPlayer.pause();
+        AllSongs.isPlaying = false;
+      }
+     });
     getPrefs();
     super.initState();
   }

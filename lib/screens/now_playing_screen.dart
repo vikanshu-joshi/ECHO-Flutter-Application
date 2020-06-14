@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:echo/model/data.dart';
@@ -8,6 +9,7 @@ import 'package:echo/widgets/bottom_sheet_allsongs.dart';
 import 'package:flutter/material.dart';
 import 'package:seekbar/seekbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:phone_state_i/phone_state_i.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   static const route = 'now playing';
@@ -18,8 +20,20 @@ class NowPlayingScreen extends StatefulWidget {
 
 class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerProviderStateMixin {
 
+    StreamSubscription _phoneState;
+
+
   @override
   void initState() {
+    _phoneState = phoneStateCallEvent.listen((event) { 
+      if(AllSongs.audioPlayer.state == AudioPlayerState.PLAYING){
+        AllSongs.audioPlayer.pause();
+        setState(() {
+          AllSongs.isPlaying = false;
+          rotationController.stop();
+        });
+      }
+     });
     rotationController = AnimationController(vsync: this,duration: Duration(milliseconds: int.parse(AllSongs.currentSong == null ? "0" : AllSongs.currentSong.duration)));
     super.initState();
   }
@@ -45,8 +59,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
       int result = await AllSongs.audioPlayer.pause();
       if (result == 1) {
         setState(() {
-          rotationController.stop();
           AllSongs.isPlaying = false;
+          rotationController.stop();
         });
       }
     } else {
