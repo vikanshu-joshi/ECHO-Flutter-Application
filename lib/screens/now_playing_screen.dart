@@ -152,6 +152,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
       if (duration.inMinutes < 60) return "$twoDigitMinutes:$twoDigitSeconds";
       return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
     }
+    return "00:00";
   }
 
   @override
@@ -270,6 +271,17 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                                   0.001),
                       barColor: Colors.white,
                       progressColor: Colors.amber,
+                      onProgressChanged: (progress) {
+                        setState(() {
+                          AllSongs.currentDuration = Duration(
+                              milliseconds: int.parse(((int.parse(
+                                          progress.toString()) *
+                                      (int.parse(
+                                              AllSongs.currentSong.duration) *
+                                          0.001))
+                                  .toString())));
+                        });
+                      },
                     ),
                   ),
                   Padding(

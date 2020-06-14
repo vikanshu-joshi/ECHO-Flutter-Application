@@ -4,7 +4,7 @@ import 'package:echo/screens/now_playing_screen.dart';
 import 'package:echo/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MyApp())  ;
 
 class MyApp extends StatelessWidget {
   @override
