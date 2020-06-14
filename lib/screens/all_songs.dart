@@ -26,6 +26,12 @@ class AllSongs extends StatefulWidget {
 class _AllSongsState extends State<AllSongs> {
 
   @override
+  void dispose() {
+    AllSongs.audioPlayer.stop();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     getPrefs();
     super.initState();

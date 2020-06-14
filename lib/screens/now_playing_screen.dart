@@ -16,7 +16,20 @@ class NowPlayingScreen extends StatefulWidget {
   _NowPlayingScreenState createState() => _NowPlayingScreenState();
 }
 
-class _NowPlayingScreenState extends State<NowPlayingScreen> {
+class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerProviderStateMixin {
+
+  @override
+  void initState() {
+    rotationController = AnimationController(vsync: this,duration: Duration(milliseconds: int.parse(AllSongs.currentSong == null ? "0" : AllSongs.currentSong.duration)));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    rotationController.dispose();
+    super.dispose();
+  }
+
   void showBottomModalSheet(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -24,12 +37,15 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
           return BottomSheetAllSongs(AllSongs.currentSong);
         });
   }
+  AnimationController rotationController;
+  
 
   void playPause() async {
     if (AllSongs.audioPlayer.state == AudioPlayerState.PLAYING) {
       int result = await AllSongs.audioPlayer.pause();
       if (result == 1) {
         setState(() {
+          rotationController.stop();
           AllSongs.isPlaying = false;
         });
       }
@@ -179,6 +195,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
     AllSongs.audioPlayer.onAudioPositionChanged.listen((onData) {
       setState(() {
         AllSongs.currentDuration = onData;
+        rotationController.forward();
       });
     });
     return Scaffold(
@@ -238,10 +255,13 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.only(top: 20),
-                  child: Image.asset(
-                    'assets/images/disc.png',
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width * 0.7,
+                  child: RotationTransition(
+                    turns: Tween(begin: 0.0,end: 200.0).animate(rotationController),
+                    child: Image.asset(
+                      'assets/images/disc.png',
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width * 0.7,
+                    ),
                   ),
                 ),
                 Positioned(
