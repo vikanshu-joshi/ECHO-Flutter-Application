@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:echo/model/DurationNotifier.dart';
 import 'package:echo/model/data.dart';
 import 'package:echo/model/model.dart';
 import 'package:echo/screens/all_songs.dart';
@@ -10,36 +11,44 @@ import 'package:flutter/material.dart';
 import 'package:seekbar/seekbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:phone_state_i/phone_state_i.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
 class NowPlayingScreen extends StatefulWidget {
   static const route = 'now playing';
   final _random = Random();
+
   @override
   _NowPlayingScreenState createState() => _NowPlayingScreenState();
 }
 
-class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerProviderStateMixin {
-
-    StreamSubscription _phoneState;
-
+class _NowPlayingScreenState extends State<NowPlayingScreen>
+    with SingleTickerProviderStateMixin {
+  StreamSubscription _phoneState;
 
   @override
   void initState() {
-    _phoneState = phoneStateCallEvent.listen((event) { 
-      if(AllSongs.audioPlayer.state == AudioPlayerState.PLAYING){
+    _phoneState = phoneStateCallEvent.listen((event) {
+      if (AllSongs.audioPlayer.state == AudioPlayerState.PLAYING) {
         AllSongs.audioPlayer.pause();
         setState(() {
           AllSongs.isPlaying = false;
           rotationController.stop();
         });
       }
-     });
-    rotationController = AnimationController(vsync: this,duration: Duration(milliseconds: int.parse(AllSongs.currentSong == null ? "0" : AllSongs.currentSong.duration)));
+    });
+    rotationController = AnimationController(
+        vsync: this,
+        duration: Duration(
+            milliseconds: int.parse(AllSongs.currentSong == null
+                ? "0"
+                : AllSongs.currentSong.duration)));
     super.initState();
   }
 
   @override
   void dispose() {
+    _phoneState.cancel();
     rotationController.dispose();
     super.dispose();
   }
@@ -51,8 +60,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
           return BottomSheetAllSongs(AllSongs.currentSong);
         });
   }
+
   AnimationController rotationController;
-  
 
   void playPause() async {
     if (AllSongs.audioPlayer.state == AudioPlayerState.PLAYING) {
@@ -81,6 +90,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
       int min = 0;
       int max = SplashScreen.allSongs.length - 1;
       int x = min + widget._random.nextInt(max - min);
+      AllSongs.audioPlayer.stop();
       int result = await AllSongs.audioPlayer
           .play(SplashScreen.allSongs[x].filePath, isLocal: true);
       if (result == 1) {
@@ -96,6 +106,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
         AllSongs.audioPlayer.play(AllSongs.currentSong.filePath, isLocal: true);
       }
     } else {
+      AllSongs.audioPlayer.stop();
       int result = await AllSongs.audioPlayer.play(
           SplashScreen.allSongs[AllSongs.currIndex + 1].filePath,
           isLocal: true);
@@ -114,6 +125,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
     if (AllSongs.repeatone) {
       AllSongs.audioPlayer.seek(Duration(milliseconds: 0));
     } else if (AllSongs.shuffle) {
+      AllSongs.audioPlayer.stop();
       int result = await AllSongs.audioPlayer
           .play(AllSongs.prev.filePath, isLocal: true);
       if (result == 1) {
@@ -123,6 +135,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
         });
       }
     } else {
+      AllSongs.audioPlayer.stop();
       AllSongs.currIndex--;
       if (AllSongs.currIndex < 0) AllSongs.currIndex = 0;
       int result = await AllSongs.audioPlayer.play(
@@ -207,10 +220,9 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
       }
     }
     AllSongs.audioPlayer.onAudioPositionChanged.listen((onData) {
-      setState(() {
-        AllSongs.currentDuration = onData;
-        rotationController.forward();
-      });
+      AllSongs.currentDuration = onData;
+      rotationController.forward();
+      context.read<DurationNotifier>().setDuration(_printDuration(onData));
     });
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
@@ -270,7 +282,8 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                 Container(
                   margin: EdgeInsets.only(top: 20),
                   child: RotationTransition(
-                    turns: Tween(begin: 0.0,end: 200.0).animate(rotationController),
+                    turns: Tween(begin: 0.0, end: 10.0)
+                        .animate(rotationController),
                     child: Image.asset(
                       'assets/images/disc.png',
                       width: MediaQuery.of(context).size.width,
@@ -286,7 +299,7 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                     child: Image.asset(
                       'assets/images/holder.png',
                       width: MediaQuery.of(context).size.width * 0.6,
-                      height: MediaQuery.of(context).size.width * 0.7,
+                      height: MediaQuery.of(context).size.width * 0.68,
                     ),
                   ),
                 )
@@ -323,14 +336,12 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(
-                          AllSongs.currentDuration == null
-                              ? '00:00'
-                              : _printDuration(AllSongs.currentDuration),
-                          style: TextStyle(
-                              fontFamily: 'ComicNeue',
-                              fontWeight: FontWeight.bold),
-                        ),
+                        AllSongs.currentDuration == null
+                            ? Text('00:00',
+                                style: TextStyle(
+                                    fontFamily: 'ComicNeue',
+                                    fontWeight: FontWeight.bold))
+                            : DurationText(),
                         Text(
                           AllSongs.currentSong == null
                               ? '00:00'
@@ -396,5 +407,13 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> with SingleTickerPr
         ),
       ),
     );
+  }
+}
+
+class DurationText extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text(context.watch<DurationNotifier>().duration,
+        style: TextStyle(fontFamily: 'ComicNeue', fontWeight: FontWeight.bold));
   }
 }

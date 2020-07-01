@@ -32,6 +32,7 @@ class _AllSongsState extends State<AllSongs> {
 
   @override
   void dispose() {
+    _phoneState.cancel();
     AllSongs.audioPlayer.stop();
     super.dispose();
   }
@@ -66,6 +67,7 @@ class _AllSongsState extends State<AllSongs> {
   void _playSong(SongInfo _song, int index) async {
     AllSongs.prev = AllSongs.currentSong;
     if (AllSongs.prev == null) AllSongs.prev = SplashScreen.allSongs[0];
+    AllSongs.audioPlayer.stop();
     int result = await AllSongs.audioPlayer.play(_song.filePath, isLocal: true);
     if (result == 1) {
       AllSongs.currIndex = index;
